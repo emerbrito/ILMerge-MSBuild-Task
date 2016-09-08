@@ -3,8 +3,8 @@ Configurable ILMerge Task for MSBuild
 
 Adds ILMerge to Visual Studio 2013/2015 or automated builds. This Task is intended to work right out of the box however, it supports a configuration file where you can control every ILMerge property including the list of assemblies to be merged.
 
-Installing
-----------
+Getting Started
+---------------
 
 Use Nuget to add ILMerge.MSBuild.Task to your Visual Studio project:
 
@@ -12,37 +12,30 @@ Use Nuget to add ILMerge.MSBuild.Task to your Visual Studio project:
 Install-Package ILMerge.MSBuild.Task
 ```
 
-Build your project. A new ILMerge folder containing the merged assembly will be created in your target folder.
-
-Default Behavior
-----------------
-
-By default all references with *Copy Local* equals *true* are merged with the project output.
-
-![Copy Local Property](Images/copy_local_property.png)
-
-The actual output stays untouched and a new (merged) assemly is created under the ILMerge folder.
-The output directory can be changed through configuration.
+Build your project. The merged assembly will be stored in an ILMerge folder under your project output.
+The output directory is configurable.
 
 ![Project To Merge Output](Images/project_to_merge_output.png)
 
-Refining What Gets Merged
--------------------------
+How it Works
+------------
 
-The default behavior even though handy may not work for everyone.
-You may decide that you don't want to maintain the *Copy Local* attribute which may change after you remove and re-install packages.
-Instead you want to create a static list of assemblies to merge so you can guarantee the same result on every build. This can be done through a configuration file.
+By default all references with *Copy Local* equals *true* are merged with your project output.
+
+![Copy Local Property](Images/copy_local_property.png)
+
+It is also possible to use a static list of assemblies.
+This list can be added to the optional configuration file.
 
 ### Using a Configuration File
 
-On the root of your project create a file called:
+On the root of your project create a file named:
 
 ```
 ILMergeConfig.json
 ```
 
-This snippet will instruct the Task to ignore the *Copy Local* property and use the files from this list instead.
-See Configuration File section for a complete reference.
+This snippet instructs the Task to ignore *Copy Local* and use the files listed in the *InputAssemblies* property.
 
 ```javascript
 {
@@ -55,10 +48,9 @@ See Configuration File section for a complete reference.
 }
 ```
 
-Note the use of a variable which will be replaced at runtime with the target folder.
-See the project wiki for a list of available variables.
+See the wiki for a complete reference of [Configuration File](https://github.com/emerbrito/ILMerge-MSBuild-Task/wiki/Config-File).
 
-Configuration File
-------------------
+Project Wiki
+------------
 
-See the project wiki for more details on the cofiguration file.
+See the project wiki for documentation.
