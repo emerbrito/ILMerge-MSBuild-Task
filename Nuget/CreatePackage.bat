@@ -1,0 +1,1 @@
+Nuget pack ILMerge.MSBuild.Task.nuspec -Version 1.0.0.0
