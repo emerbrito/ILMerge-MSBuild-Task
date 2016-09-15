@@ -296,8 +296,6 @@ namespace ILMerge.MsBuild.Task
             merger.DebugInfo = settings.Advanced.DebugInfo;
             merger.DelaySign = settings.Advanced.DelaySign;
             merger.FileAlignment = settings.Advanced.FileAlignment > 0 ? settings.Advanced.FileAlignment : 512;
-            merger.Internalize = settings.Advanced.Internalize;
-            merger.ExcludeFile = settings.Advanced.ExcludeFile;
             merger.KeyFile = settings.General.KeyFile;
             merger.Log = settings.Advanced.Log;
             merger.LogFile = settings.Advanced.LogFile;
@@ -306,7 +304,12 @@ namespace ILMerge.MsBuild.Task
             merger.UnionMerge = settings.Advanced.UnionMerge;
             merger.XmlDocumentation = settings.Advanced.XmlDocumentation;
 
-            if(settings.Advanced.TargetKind.HasValue())
+            if(!string.IsNullOrWhiteSpace(settings.Advanced.ExcludeFile))
+                merger.ExcludeFile = settings.Advanced.ExcludeFile;
+
+            merger.Internalize = settings.Advanced.Internalize;
+            
+            if (settings.Advanced.TargetKind.HasValue())
                 merger.TargetKind = (dynamic) Enum.Parse(merger.TargetKind.GetType(), settings.Advanced.TargetKind);
 
             if (settings.Advanced.Version.HasValue())
@@ -364,6 +367,11 @@ namespace ILMerge.MsBuild.Task
                 Log.LogErrorFromException(exception);
                 success = false;
             }
+            finally
+            {
+                merger = null;
+                ilmerge = null;
+            }
 
             return success;
 
@@ -375,6 +383,7 @@ namespace ILMerge.MsBuild.Task
             if (string.IsNullOrWhiteSpace(mergerPath)) throw new ArgumentNullException(nameof(mergerPath));
 
             Log.LogMessage($"Loading ILMerge from '{mergerPath}'.");
+
             Assembly ilmerge = Assembly.LoadFrom(mergerPath);
 
             return ilmerge;
