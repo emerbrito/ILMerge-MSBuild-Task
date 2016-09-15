@@ -286,6 +286,7 @@ namespace ILMerge.MsBuild.Task
             dynamic merger = Activator.CreateInstance(ilmergeType);
 
             Log.LogMessage("Setting up ILMerge.");
+
             merger.AllowMultipleAssemblyLevelAttributes = settings.Advanced.AllowMultipleAssemblyLevelAttributes;
             merger.AllowWildCards = settings.Advanced.AllowWildCards;
             merger.AllowZeroPeKind = settings.Advanced.AllowZeroPeKind;
@@ -301,7 +302,7 @@ namespace ILMerge.MsBuild.Task
             merger.Log = settings.Advanced.Log;
             merger.LogFile = settings.Advanced.LogFile;
             merger.OutputFile = settings.General.OutputFile;
-            merger.PublicKeyTokens = settings.Advanced.PublicKeyTokens;            
+            merger.PublicKeyTokens = settings.Advanced.PublicKeyTokens;
             merger.UnionMerge = settings.Advanced.UnionMerge;
             merger.XmlDocumentation = settings.Advanced.XmlDocumentation;
 
@@ -331,7 +332,7 @@ namespace ILMerge.MsBuild.Task
 
             string[] tp = settings.General.TargetPlatform.Split(new string[] {","}, StringSplitOptions.RemoveEmptyEntries);
 
-            merger.SetTargetPlatform(tp[0], tp[1]);
+            merger.SetTargetPlatform(tp[0].Trim(), @tp[1].Trim());
             merger.SetInputAssemblies(settings.General.InputAssemblies.ToArray());
             merger.SetSearchDirectories(settings.Advanced.SearchDirectories.ToArray());
 
@@ -349,8 +350,8 @@ namespace ILMerge.MsBuild.Task
                 Log.LogMessage(
                     MessageImportance.Normal,
                     "Merging {0} assembl{1} to '{2}'.",
-                    this.InputAssemblies.Length,
-                    (this.InputAssemblies.Length != 1) ? "ies" : "y",
+                    settings.General.InputAssemblies.Count.ToString(),
+                    (settings.General.InputAssemblies.Count != 1) ? "ies" : "y",
                     settings.General.OutputFile);
 
                 merger.Merge();

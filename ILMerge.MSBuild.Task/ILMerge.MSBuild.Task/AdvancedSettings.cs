@@ -65,7 +65,7 @@ namespace ILMerge.MsBuild.Task
         public bool DelaySign { get; set; } = false;
 
         [DataMember]
-        public string ExcludeFile { get; set; } = string.Empty;
+        public string ExcludeFile { get; set; } = "";
 
         [DataMember]
         public int FileAlignment { get; set; } = 512;
