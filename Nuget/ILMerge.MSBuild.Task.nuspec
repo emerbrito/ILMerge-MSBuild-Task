@@ -9,8 +9,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Adds ILMerge to Visual Studio 2013/2015 or automated builds. This Task is intended to work right out of the box however, it supports a configuration file where you can control every ILMerge property including the list of assemblies to be merged.</description>    
     <copyright>Emerson Brito (c) 2016</copyright>
-    <projectUrl>https://github.com/emerbrito/ilmerge-msbuild-task-config</projectUrl>
-    <licenseUrl>https://github.com/emerbrito/ilmerge-msbuild-task-config/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/emerbrito/ILMerge-MSBuild-Task</projectUrl>
+    <licenseUrl>https://github.com/emerbrito/ILMerge-MSBuild-Task/blob/master/LICENSE</licenseUrl>
     <tags>ilmerge msbuild dynamics crm merge</tags>
   </metadata>
   <files>
