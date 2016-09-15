@@ -56,7 +56,7 @@ namespace ILMerge.MsBuild.Task
         public bool Closed { get; set; } = false;
 
         [DataMember]
-        public bool CopyAttributes { get; set; } = false;
+        public bool CopyAttributes { get; set; } = true;
 
         [DataMember]
         public bool DebugInfo { get; set; } = true;
