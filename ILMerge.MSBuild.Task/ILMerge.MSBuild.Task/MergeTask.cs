@@ -510,7 +510,7 @@ namespace ILMerge.MsBuild.Task
 
         private string EscapePath(string path)
         {
-            return Regex.Replace(path, @"\\", @"\\");
+            return Regex.Replace(path ?? "", @"\\", @"\\");
         }
 
         #endregion
