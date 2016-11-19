@@ -221,15 +221,15 @@ namespace ILMerge.MsBuild.Task
         private string ReplaceTokens(string jsonConfig)
         {
             return jsonConfig
-                .Replace("$(SolutionDir)", EscapePath(this.SolutionDir))
-                .Replace("$(SolutionPath)", EscapePath(this.SolutionPath))
-                .Replace("$(ProjectDir)", EscapePath(this.ProjectDir))
-                .Replace("$(ProjectFileName)", EscapePath(this.ProjectFileName))
-                .Replace("$(ProjectPath)", EscapePath(this.ProjectPath))
-                .Replace("$(TargetDir)", EscapePath(this.TargetDir))
-                .Replace("$(TargetPath)", EscapePath(this.TargetPath))
-                .Replace("$(TargetFileName)", EscapePath(this.TargetFileName))
-                .Replace("$(AssemblyOriginatorKeyFile)", EscapePath(this.KeyFile));
+                .Replace("$(SolutionDir)", this.SolutionDir)
+                .Replace("$(SolutionPath)", this.SolutionPath)
+                .Replace("$(ProjectDir)", this.ProjectDir)
+                .Replace("$(ProjectFileName)", this.ProjectFileName)
+                .Replace("$(ProjectPath)", this.ProjectPath)
+                .Replace("$(TargetDir)", this.TargetDir)
+                .Replace("$(TargetPath)", this.TargetPath)
+                .Replace("$(TargetFileName)", this.TargetFileName)
+                .Replace("$(AssemblyOriginatorKeyFile)", this.KeyFile);
         }
 
         private void SetDefaults(MergerSettings settings)
@@ -506,11 +506,6 @@ namespace ILMerge.MsBuild.Task
 
             Log.LogMessage("Saving current configuration to: {0}", outputPath);
             File.WriteAllText(outputPath, settings.ToJson(), Encoding.UTF8);
-        }
-
-        private string EscapePath(string path)
-        {
-            return Regex.Replace(path, @"\\", @"\\");
         }
 
         #endregion
