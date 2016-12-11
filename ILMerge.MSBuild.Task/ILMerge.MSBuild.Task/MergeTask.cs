@@ -237,24 +237,29 @@ namespace ILMerge.MsBuild.Task
 
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
+            if(settings.General == null)
+            {
+                settings.General = new GeneralSettings();
+            }
+
             if (!settings.General.KeyFile.HasValue() && this.KeyFile.HasValue())
             {
                 settings.General.KeyFile = ToAbsolutePath(KeyFile);
                 Log.LogMessage("Applying default value for KeyFile.");
             }
-                
+
             if (!settings.General.OutputFile.HasValue())
             {
                 settings.General.OutputFile = Path.Combine(this.TargetDir, "ILMerge", this.TargetFileName);
                 Log.LogMessage("Applying default value for OutputFile.");
-            }                
+            }
 
             if (!settings.General.TargetPlatform.HasValue())
             {
                 settings.General.TargetPlatform = FrameworkInfo.ToILmergeTargetPlatform(this.TargetFrameworkVersion, this.TargetArchitecture);
                 Log.LogMessage($"Applying default value for TargetPlatform: {settings.General.TargetPlatform}");
-            }  
-            
+            }
+
             if(settings.General.InputAssemblies == null || settings.General.InputAssemblies.Count == 0)
             {
 
@@ -269,8 +274,15 @@ namespace ILMerge.MsBuild.Task
             }
             else
             {
+                settings.General.InputAssemblies = new List<string>();
                 settings.General.InputAssemblies.Insert(0, this.TargetPath);
             }
+
+            if (settings.Advanced == null)
+            {
+                settings.Advanced = new AdvancedSettings();
+            }
+
             
         }
 
