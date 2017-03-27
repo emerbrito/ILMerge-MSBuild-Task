@@ -150,7 +150,9 @@ namespace ILMerge.MsBuild.Task
 
             if(!exePath.HasValue())
             {
-                Log.LogError("ILMerge.exe was no located. Unable to proceed.");
+                Log.LogError("ILMerge.exe was no located. Make sure you have the ILMerge nuget package installed." 
+                    + "If you have a custom location for your nuget packages, we won't be able to figure it out." 
+                    + "In this case please use attribute 'AlternativeILMergePath' in the configuration file to indicate the full path for ILMerge.exe.");
                 return false;
             }
 
@@ -482,6 +484,17 @@ namespace ILMerge.MsBuild.Task
                 {
                     Log.LogWarning($"ILMerge.exe not found at (solution dir): {this.SolutionDir}");
                 }
+            }
+
+            // get the location of the this assembly (task dll) and assumes it is under the packages folder.
+            // use this information to determine the possible location of the executable.
+            if (ExeLocationHelper.TryLocatePackagesFolder(out exePath))
+            {
+                Log.LogMessage($"ILMerge.exe found at custom package location: {exePath}");
+                return exePath;
+            }
+            {
+                Log.LogWarning($"Unable to determine custom package location.");
             }
 
             return exePath;

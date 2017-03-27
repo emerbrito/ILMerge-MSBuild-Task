@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -95,6 +96,48 @@ namespace ILMerge.MsBuild.Task
             {
                 executablePath = fullPath;
                 return true;
+            }
+
+            return false;
+
+        }
+
+        public static bool TryLocatePackagesFolder(out string executablePath)
+        {
+
+            executablePath = null;
+            var taskLibPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var dir = new DirectoryInfo(taskLibPath);
+
+            DirectoryInfo root = null;
+            DirectoryInfo[] subDirs = null;
+
+            if (dir.Parent == null)
+            {
+                return false;
+            }
+
+            if (dir.Parent.Parent == null)
+            {
+                return false;   
+            }
+
+            root = dir.Parent.Parent;
+            subDirs = root.GetDirectories("ILMerge.*", SearchOption.TopDirectoryOnly);
+
+            if(subDirs == null || subDirs.Count() == 0)
+            {
+                return false;
+            }
+
+            foreach (var item in subDirs)
+            {
+                var files = item.GetFiles("ILMerge.exe", SearchOption.AllDirectories);
+                if(files != null && files.Any())
+                {
+                    executablePath = files[0].FullName;
+                    return true;
+                }
             }
 
             return false;
