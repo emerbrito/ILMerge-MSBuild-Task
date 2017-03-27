@@ -12,6 +12,9 @@
     <projectUrl>https://github.com/emerbrito/ILMerge-MSBuild-Task</projectUrl>
     <licenseUrl>https://github.com/emerbrito/ILMerge-MSBuild-Task/blob/master/LICENSE</licenseUrl>
     <tags>ilmerge msbuild dynamics crm merge</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="10.0.1" />
+    </dependencies>    
   </metadata>
   <files>
     <file src="..\ILMerge.MSBuild.Task\ILMerge.MSBuild.Task\bin\release\ILMerge.MsBuild.Task.dll" target="tools\ILMerge.MsBuild.Task.dll" />
