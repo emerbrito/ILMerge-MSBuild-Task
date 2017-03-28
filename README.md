@@ -30,8 +30,8 @@ For example, a static list of assemblies can be used instead of the dynamic depe
 {
 	"General": {
 		"InputAssemblies": [
-		  "$(TargetDir)XrmUtils.Plugins.Abstractions", 
-		  "$(TargetDir)XrmUtils.Plugins.Utilities" 
+		  "XrmUtils.Plugins.Abstractions", 
+		  "XrmUtils.Plugins.Utilities" 
 		]
 	}
 }
