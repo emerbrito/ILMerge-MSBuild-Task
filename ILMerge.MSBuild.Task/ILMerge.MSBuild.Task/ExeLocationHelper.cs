@@ -45,6 +45,11 @@ namespace ILMerge.MsBuild.Task
             executablePath = null;
             string basePath = Path.Combine(solutionDir, "packages");
 
+            if(!Directory.Exists(basePath))
+            {
+                return false;
+            }
+
             // retrieve all ILMerge directories (can have multiple versions)
             IEnumerable<string> dirs = Directory.EnumerateDirectories(basePath, "ILMerge.*", SearchOption.TopDirectoryOnly);
             if (dirs == null || dirs.Count() == 0)
@@ -102,7 +107,7 @@ namespace ILMerge.MsBuild.Task
 
         }
 
-        public static bool TryLocatePackagesFolder(out string executablePath)
+        public static bool TryLocatePackagesFolder(TaskLoggingHelper logger, out string executablePath)
         {
 
             executablePath = null;
@@ -112,29 +117,38 @@ namespace ILMerge.MsBuild.Task
             DirectoryInfo root = null;
             DirectoryInfo[] subDirs = null;
 
+            logger.LogWarning("Task lib location: {0}", dir.FullName);            
+
             if (dir.Parent == null)
             {
+                logger.LogWarning("Unable to determine parent folder.");
                 return false;
             }
 
             if (dir.Parent.Parent == null)
             {
+                logger.LogWarning("Unable to determine root folder.");
                 return false;   
             }
 
             root = dir.Parent.Parent;
             subDirs = root.GetDirectories("ILMerge.*", SearchOption.TopDirectoryOnly);
 
-            if(subDirs == null || subDirs.Count() == 0)
+            logger.LogWarning("Package location: {0}", root.FullName);
+
+            if (subDirs == null || subDirs.Count() == 0)
             {
+                logger.LogWarning("No folder starting with 'ILMerge' were found under {0}.", root.FullName);
                 return false;
             }
 
             foreach (var item in subDirs)
             {
+                
                 var files = item.GetFiles("ILMerge.exe", SearchOption.AllDirectories);
                 if(files != null && files.Any())
                 {
+                    logger.LogWarning("Executable found by dynamic searach at: {0}", item.FullName);
                     executablePath = files[0].FullName;
                     return true;
                 }
