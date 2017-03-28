@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -43,6 +44,11 @@ namespace ILMerge.MsBuild.Task
 
             executablePath = null;
             string basePath = Path.Combine(solutionDir, "packages");
+
+            if(!Directory.Exists(basePath))
+            {
+                return false;
+            }
 
             // retrieve all ILMerge directories (can have multiple versions)
             IEnumerable<string> dirs = Directory.EnumerateDirectories(basePath, "ILMerge.*", SearchOption.TopDirectoryOnly);
@@ -95,6 +101,57 @@ namespace ILMerge.MsBuild.Task
             {
                 executablePath = fullPath;
                 return true;
+            }
+
+            return false;
+
+        }
+
+        public static bool TryLocatePackagesFolder(TaskLoggingHelper logger, out string executablePath)
+        {
+
+            executablePath = null;
+            var taskLibPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var dir = new DirectoryInfo(taskLibPath);
+
+            DirectoryInfo root = null;
+            DirectoryInfo[] subDirs = null;
+
+            logger.LogWarning("Task lib location: {0}", dir.FullName);            
+
+            if (dir.Parent == null)
+            {
+                logger.LogWarning("Unable to determine parent folder.");
+                return false;
+            }
+
+            if (dir.Parent.Parent == null)
+            {
+                logger.LogWarning("Unable to determine root folder.");
+                return false;   
+            }
+
+            root = dir.Parent.Parent;
+            subDirs = root.GetDirectories("ILMerge.*", SearchOption.TopDirectoryOnly);
+
+            logger.LogWarning("Package location: {0}", root.FullName);
+
+            if (subDirs == null || subDirs.Count() == 0)
+            {
+                logger.LogWarning("No folder starting with 'ILMerge' were found under {0}.", root.FullName);
+                return false;
+            }
+
+            foreach (var item in subDirs)
+            {
+                
+                var files = item.GetFiles("ILMerge.exe", SearchOption.AllDirectories);
+                if(files != null && files.Any())
+                {
+                    logger.LogWarning("Executable found by dynamic searach at: {0}", item.FullName);
+                    executablePath = files[0].FullName;
+                    return true;
+                }
             }
 
             return false;

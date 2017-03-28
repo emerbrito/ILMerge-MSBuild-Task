@@ -1,7 +1,7 @@
 Configurable ILMerge Task for MSBuild
 =====================================
 
-Adds ILMerge to Visual Studio 2013/2015 or automated builds. This Task is intended to work right out of the box however, it supports a configuration file where you can control every ILMerge property including the list of assemblies to be merged.
+Adds ILMerge to Visual Studio 2013/2017 or automated builds. This Task is intended to work right out of the box however, it supports a configuration file where you can control every ILMerge property including the list of assemblies to be merged.
 
 Getting Started
 ---------------
@@ -19,19 +19,19 @@ The output directory is configurable.
 
 ![Project To Merge Output](Images/project_to_merge_output.png)
 
-Easy to User and Configure
+Easy to Use and Configure
 --------------------------
 
 By default all references with *Copy Local* equals *true* are merged to the project output, giving you an "ILMerged" assembly right out of the box.
-You can change this behavior and a lot more through an option configuration file.
+You can change this behavior and a lot more through an optional configuration file.
 For example, a static list of assemblies can be used instead of the dynamic dependency on the *Copy Local* property.
 
 ```javascript
 {
 	"General": {
 		"InputAssemblies": [
-		  "$(TargetDir)XrmUtils.Plugins.Abstractions", 
-		  "$(TargetDir)XrmUtils.Plugins.Utilities" 
+		  "XrmUtils.Plugins.Abstractions", 
+		  "XrmUtils.Plugins.Utilities" 
 		]
 	}
 }

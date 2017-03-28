@@ -34,7 +34,6 @@ using System.Threading.Tasks;
 namespace ILMerge.MsBuild.Task
 {
 
-    [DataContract]
     public class GeneralSettings
     {
 

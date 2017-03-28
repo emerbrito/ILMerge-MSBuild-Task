@@ -150,7 +150,9 @@ namespace ILMerge.MsBuild.Task
 
             if(!exePath.HasValue())
             {
-                Log.LogError("ILMerge.exe was no located. Unable to proceed.");
+                Log.LogError("ILMerge.exe was no located. Make sure you have the ILMerge nuget package installed. " 
+                    + "If you defined a custom packages folder in your Nuget.Config it is possible we are having a hard time figuring it out. " 
+                    + "In this case please use attribute 'AlternativeILMergePath' in the configuration file to indicate the full path for ILMerge.exe.");
                 return false;
             }
 
@@ -262,25 +264,44 @@ namespace ILMerge.MsBuild.Task
 
             if(settings.General.InputAssemblies == null || settings.General.InputAssemblies.Count == 0)
             {
+                Log.LogMessage("No input assembles were found in configuration.");
 
                 settings.General.InputAssemblies = new List<string>();
-                settings.General.InputAssemblies.Add(this.TargetPath);
+
+                Log.LogMessage($"Adding target assembly: {this.TargetPath}");
+                settings.General.InputAssemblies.Add(this.TargetPath);                
 
                 foreach (var item in this.InputAssemblies)
                 {
+                    Log.LogMessage($"Adding assembly: {item.ItemSpec}");
                     settings.General.InputAssemblies.Add(item.ItemSpec);
                 }
 
             }
             else
             {
-                settings.General.InputAssemblies = new List<string>();
-                settings.General.InputAssemblies.Insert(0, this.TargetPath);
+                foreach (var item in settings.General.InputAssemblies)
+                {
+                    Log.LogMessage($"Config input assembly: {item}");
+                }
+
+                Log.LogMessage($"Adding target assembly at position [0]: {this.TargetPath}");
+                settings.General.InputAssemblies.Insert(0, this.TargetPath);                
             }
 
             if (settings.Advanced == null)
             {
                 settings.Advanced = new AdvancedSettings();
+            }
+
+            if(settings.Advanced.SearchDirectories == null)
+            {
+                settings.Advanced.SearchDirectories = new List<string>();
+            }
+
+            if(!settings.Advanced.SearchDirectories.Contains(this.TargetDir))
+            {
+                settings.Advanced.SearchDirectories.Add(this.TargetDir);
             }
 
             
@@ -445,6 +466,8 @@ namespace ILMerge.MsBuild.Task
         {
 
             string exePath = null;
+            string errMsg;
+            var failedPaths = new List<string>();
 
             // look at same directory as this assembly (task dll);
             if (ExeLocationHelper.TryValidateILMergePath(Path.GetDirectoryName(this.GetType().Assembly.Location), out exePath))
@@ -454,7 +477,9 @@ namespace ILMerge.MsBuild.Task
             }
             else
             {
-                Log.LogMessage($"ILMerge.exe not found at (task location): {Path.GetDirectoryName(this.GetType().Assembly.Location)}");
+                errMsg = $"ILMerge.exe not found at (task location): {Path.GetDirectoryName(this.GetType().Assembly.Location)}";
+                failedPaths.Add(errMsg);
+                Log.LogMessage(errMsg);
             }
 
             // look at target dir;
@@ -467,7 +492,9 @@ namespace ILMerge.MsBuild.Task
                 }
                 else
                 {
-                    Log.LogMessage($"ILMerge.exe not found at (target dir): {this.TargetDir}");
+                    errMsg = $"ILMerge.exe not found at (target dir): {this.TargetDir}";
+                    failedPaths.Add(errMsg);
+                    Log.LogMessage(errMsg);
                 }
             }
 
@@ -480,8 +507,28 @@ namespace ILMerge.MsBuild.Task
                     return exePath;
                 }
                 {
-                    Log.LogWarning($"ILMerge.exe not found at (solution dir): {this.SolutionDir}");
+                    errMsg = $"ILMerge.exe not found at (solution dir): {this.SolutionDir}";
+                    failedPaths.Add(errMsg);
+                    Log.LogMessage(errMsg);
                 }
+            }
+
+            // get the location of the this assembly (task dll) and assumes it is under the packages folder.
+            // use this information to determine the possible location of the executable.
+            if (ExeLocationHelper.TryLocatePackagesFolder(Log, out exePath))
+            {
+                Log.LogMessage($"ILMerge.exe found at custom package location: {exePath}");
+                return exePath;
+            }
+            {
+
+                foreach (var err in failedPaths)
+                {
+                    Log.LogWarning(err);
+                }
+
+                Log.LogWarning($"Unable to determine custom package location or, location was determined but an ILMerge package folder was not found.");
+
             }
 
             return exePath;
