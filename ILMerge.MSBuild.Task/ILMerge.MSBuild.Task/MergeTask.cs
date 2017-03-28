@@ -264,25 +264,44 @@ namespace ILMerge.MsBuild.Task
 
             if(settings.General.InputAssemblies == null || settings.General.InputAssemblies.Count == 0)
             {
+                Log.LogMessage("No input assembles were found in configuration.");
 
                 settings.General.InputAssemblies = new List<string>();
-                settings.General.InputAssemblies.Add(this.TargetPath);
+
+                Log.LogMessage($"Adding target assembly: {this.TargetPath}");
+                settings.General.InputAssemblies.Add(this.TargetPath);                
 
                 foreach (var item in this.InputAssemblies)
                 {
+                    Log.LogMessage($"Adding assembly: {item.ItemSpec}");
                     settings.General.InputAssemblies.Add(item.ItemSpec);
                 }
 
             }
             else
             {
-                settings.General.InputAssemblies = new List<string>();
-                settings.General.InputAssemblies.Insert(0, this.TargetPath);
+                foreach (var item in settings.General.InputAssemblies)
+                {
+                    Log.LogMessage($"Config input assembly: {item}");
+                }
+
+                Log.LogMessage($"Adding target assembly at position [0]: {this.TargetPath}");
+                settings.General.InputAssemblies.Insert(0, this.TargetPath);                
             }
 
             if (settings.Advanced == null)
             {
                 settings.Advanced = new AdvancedSettings();
+            }
+
+            if(settings.Advanced.SearchDirectories == null)
+            {
+                settings.Advanced.SearchDirectories = new List<string>();
+            }
+
+            if(!settings.Advanced.SearchDirectories.Contains(this.TargetDir))
+            {
+                settings.Advanced.SearchDirectories.Add(this.TargetDir);
             }
 
             
@@ -447,6 +466,8 @@ namespace ILMerge.MsBuild.Task
         {
 
             string exePath = null;
+            string errMsg;
+            var failedPaths = new List<string>();
 
             // look at same directory as this assembly (task dll);
             if (ExeLocationHelper.TryValidateILMergePath(Path.GetDirectoryName(this.GetType().Assembly.Location), out exePath))
@@ -456,7 +477,9 @@ namespace ILMerge.MsBuild.Task
             }
             else
             {
-                Log.LogMessage($"ILMerge.exe not found at (task location): {Path.GetDirectoryName(this.GetType().Assembly.Location)}");
+                errMsg = $"ILMerge.exe not found at (task location): {Path.GetDirectoryName(this.GetType().Assembly.Location)}";
+                failedPaths.Add(errMsg);
+                Log.LogMessage(errMsg);
             }
 
             // look at target dir;
@@ -469,7 +492,9 @@ namespace ILMerge.MsBuild.Task
                 }
                 else
                 {
-                    Log.LogMessage($"ILMerge.exe not found at (target dir): {this.TargetDir}");
+                    errMsg = $"ILMerge.exe not found at (target dir): {this.TargetDir}";
+                    failedPaths.Add(errMsg);
+                    Log.LogMessage(errMsg);
                 }
             }
 
@@ -482,7 +507,9 @@ namespace ILMerge.MsBuild.Task
                     return exePath;
                 }
                 {
-                    Log.LogWarning($"ILMerge.exe not found at (solution dir): {this.SolutionDir}");
+                    errMsg = $"ILMerge.exe not found at (solution dir): {this.SolutionDir}";
+                    failedPaths.Add(errMsg);
+                    Log.LogMessage(errMsg);
                 }
             }
 
@@ -494,7 +521,14 @@ namespace ILMerge.MsBuild.Task
                 return exePath;
             }
             {
+
+                foreach (var err in failedPaths)
+                {
+                    Log.LogWarning(err);
+                }
+
                 Log.LogWarning($"Unable to determine custom package location or, location was determined but an ILMerge package folder was not found.");
+
             }
 
             return exePath;

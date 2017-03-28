@@ -24,7 +24,6 @@
  */
 #endregion
 
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,6 +32,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace ILMerge.MsBuild.Task
 {
@@ -46,8 +46,9 @@ namespace ILMerge.MsBuild.Task
 
         public string ToJson()
         {
-            string output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            return output;
+            var srl = new JavaScriptSerializer();
+            var json = srl.Serialize(this);
+            return json;
         }
 
         public static MergerSettings FromJson(string jsonString)
@@ -58,9 +59,10 @@ namespace ILMerge.MsBuild.Task
                 throw new ArgumentNullException(nameof(jsonString));
             }
 
-            var result = JsonConvert.DeserializeObject<MergerSettings>(jsonString);
+            var srl = new JavaScriptSerializer();
+            var obj = srl.Deserialize<MergerSettings>(jsonString);
 
-            return result;
+            return obj;
 
         }
 

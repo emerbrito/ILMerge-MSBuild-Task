@@ -24,7 +24,6 @@
  */
 #endregion
 
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,19 +37,19 @@ namespace ILMerge.MsBuild.Task
     public class GeneralSettings
     {
 
-        [JsonProperty(Order = 1)]
+        [DataMember(Order = 1)]
         public string OutputFile { get; set; } = null;
 
-        [JsonProperty(Order = 2)]
+        [DataMember(Order = 2)]
         public string TargetPlatform { get; set; } = null;
 
-        [JsonProperty(Order = 3)]
+        [DataMember(Order = 3)]
         public string KeyFile { get; set; } = null;
 
-        [JsonProperty(Order = 4)]
+        [DataMember(Order = 4)]
         public string AlternativeILMergePath { get; set; } = null;
 
-        [JsonProperty(Order = 5)]
+        [DataMember(Order = 5)]
         public List<string> InputAssemblies { get; set; }
 
         public GeneralSettings()
