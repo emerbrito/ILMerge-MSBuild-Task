@@ -1,5 +1,4 @@
 ﻿#region MIT License
-
 /*
     MIT License
 
@@ -23,8 +22,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
  */
-
-#endregion MIT License
+#endregion
 
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
@@ -40,19 +38,22 @@ using System.Threading.Tasks;
 
 namespace ILMerge.MsBuild.Task
 {
+
     // project properties
     // http://stackoverflow.com/questions/2772426/how-to-access-the-msbuild-s-properties-list-when-coding-a-custom-task
+
 
     // dependencies
     // http://stackoverflow.com/questions/8849289/get-dependent-assemblies
 
     public class MergeTask : Microsoft.Build.Utilities.Task
     {
+
         #region Public Properties
 
         public virtual ITaskItem[] InputAssemblies { get; set; }
 
-        public virtual string[] UnmergedAssemblies { get; set; }
+        public string[] UnmergedAssemblies { get; set; }
 
         [Required]
         public string ConfigurationFilePath { get; set; }
@@ -83,7 +84,7 @@ namespace ILMerge.MsBuild.Task
 
         public string KeyFile { get; set; }
 
-        #endregion Public Properties
+        #endregion
 
         #region Constructors
 
@@ -92,12 +93,13 @@ namespace ILMerge.MsBuild.Task
             this.InputAssemblies = new ITaskItem[0];
         }
 
-        #endregion Constructors
+        #endregion
 
         #region Public Methods
 
         public override bool Execute()
         {
+
             LogInputVariables();
 
             string jsonConfig;
@@ -166,15 +168,18 @@ namespace ILMerge.MsBuild.Task
                 return false;
             }
 
+
             return true;
+
         }
 
-        #endregion Public Methods
+        #endregion
 
         #region Private Methods
 
         private void LogInputVariables()
         {
+
             Log.LogMessage($"SolutionDir: {SolutionDir}");
             Log.LogMessage($"SolutionPath: {SolutionPath}");
             Log.LogMessage($"ProjectDir: {ProjectDir}");
@@ -187,10 +192,12 @@ namespace ILMerge.MsBuild.Task
             Log.LogMessage($"TargetArchitecture: {TargetArchitecture}");
             Log.LogMessage($"KeyFile: {KeyFile}");
             Log.LogMessage($"ConfigurationFilePath: {ConfigurationFilePath}");
+
         }
 
         private bool DeserializeJsonConfig(string jsonConfig, out MergerSettings settings)
         {
+
             settings = null;
             bool success = true;
 
@@ -214,6 +221,7 @@ namespace ILMerge.MsBuild.Task
             }
 
             return success;
+
         }
 
         private string ReplaceTokens(string jsonConfig)
@@ -232,6 +240,7 @@ namespace ILMerge.MsBuild.Task
 
         private void SetDefaults(MergerSettings settings)
         {
+
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             if (settings.General == null)
@@ -271,6 +280,7 @@ namespace ILMerge.MsBuild.Task
                     Log.LogMessage($"Adding assembly: {item.ItemSpec}");
                     settings.General.InputAssemblies.Add(item.ItemSpec);
                 }
+
             }
             else
             {
@@ -310,6 +320,7 @@ namespace ILMerge.MsBuild.Task
 
         private bool MergeAssemblies(string mergerPath, MergerSettings settings)
         {
+
             bool success = true;
             Assembly ilmerge = LoadILMerge(mergerPath);
             Type ilmergeType = ilmerge.GetType("ILMerging.ILMerge", true, true);
@@ -348,6 +359,7 @@ namespace ILMerge.MsBuild.Task
             if (settings.Advanced.Version.HasValue())
             {
                 merger.Version = new Version(settings.Advanced.Version);
+
             }
 
             if (settings.Advanced.AllowDuplicateType.HasValue())
@@ -373,6 +385,7 @@ namespace ILMerge.MsBuild.Task
 
             try
             {
+
                 string outputDir = Path.GetDirectoryName(settings.General.OutputFile);
                 if (!Directory.Exists(outputDir))
                 {
@@ -405,10 +418,12 @@ namespace ILMerge.MsBuild.Task
             }
 
             return success;
+
         }
 
         private Assembly LoadILMerge(string mergerPath)
         {
+
             if (string.IsNullOrWhiteSpace(mergerPath)) throw new ArgumentNullException(nameof(mergerPath));
 
             Log.LogMessage($"Loading ILMerge from '{mergerPath}'.");
@@ -416,10 +431,12 @@ namespace ILMerge.MsBuild.Task
             Assembly ilmerge = Assembly.LoadFrom(mergerPath);
 
             return ilmerge;
+
         }
 
         private bool ReadConfigFile(out string jsonConfig)
         {
+
             jsonConfig = string.Empty;
             bool success = true;
 
@@ -437,9 +454,11 @@ namespace ILMerge.MsBuild.Task
                 {
                     try
                     {
+
                         Log.LogMessage($"Loading configuration from: {ConfigurationFilePath}");
                         jsonConfig = File.ReadAllText(ConfigurationFilePath, Encoding.UTF8);
                         Log.LogMessage($"Configuration file loaded successfully.");
+
                     }
                     catch (Exception ex)
                     {
@@ -451,10 +470,12 @@ namespace ILMerge.MsBuild.Task
             }
 
             return success;
+
         }
 
         public string GetILMergePath()
         {
+
             string exePath = null;
             string errMsg;
             var failedPaths = new List<string>();
@@ -511,19 +532,23 @@ namespace ILMerge.MsBuild.Task
                 return exePath;
             }
             {
+
                 foreach (var err in failedPaths)
                 {
                     Log.LogWarning(err);
                 }
 
                 Log.LogWarning($"Unable to determine custom package location or, location was determined but an ILMerge package folder was not found.");
+
             }
 
             return exePath;
+
         }
 
         private string ToAbsolutePath(string relativePath)
         {
+
             // if path is not rooted assume it is relative.
             // convert relative to absolute using project dir as root.
 
@@ -535,10 +560,12 @@ namespace ILMerge.MsBuild.Task
             }
 
             return Path.GetFullPath(Path.Combine(ProjectDir, relativePath));
+
         }
 
         private void LogConfigFile(MergerSettings settings)
         {
+
             string outputPath = Path.Combine(Path.GetDirectoryName(settings.General.OutputFile), Path.GetFileNameWithoutExtension(settings.General.OutputFile) + ".merge.json");
             string outputDir = Path.GetDirectoryName(outputPath);
 
@@ -556,6 +583,9 @@ namespace ILMerge.MsBuild.Task
             return Regex.Replace(path ?? "", @"\\", @"\\");
         }
 
-        #endregion Private Methods
+        #endregion
+
     }
 }
+
+
