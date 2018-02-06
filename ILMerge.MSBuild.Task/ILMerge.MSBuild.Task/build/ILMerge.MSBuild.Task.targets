@@ -6,7 +6,8 @@
   <Target Name="MergeAssembly" AfterTargets="CopyFilesToOutputDirectory">
 
     <ItemGroup>
-      <CopyLocalReferences Include="@(ReferencePath)" Condition=" '%(CopyLocal)' == 'true' "/>
+      <CopyLocalReferences Include="@(ReferencePath)" Condition=" '%(CopyLocal)' == 'true' " />
+      <UnmergedAssemblies Include="@(ReferencePath)" Condition=" '%(CopyLocal)' == 'false' " />
     </ItemGroup>
 
     <MergeTask
@@ -19,12 +20,10 @@
       TargetPath="$(TargetPath)"
       TargetFileName="$(TargetFileName)"
       InputAssemblies="@(CopyLocalReferences)"
+      UnmergedAssemblies="@(UnmergedAssemblies->'%(FullPath)')"
       TargetFrameworkVersion="$(TargetFrameworkVersion)"
       TargetArchitecture="$(Platform)"
       KeyFile="$(AssemblyOriginatorKeyFile)"
-      ConfigurationFilePath="$(ProjectDir)ILMergeConfig.json"
-      />
-
+      ConfigurationFilePath="$(ProjectDir)ILMergeConfig.json" />
   </Target>
-
 </Project>
