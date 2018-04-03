@@ -72,14 +72,13 @@ namespace ILMerge.MsBuild.Task
                     return true;
                 case "45":
                 case "46":
+                case "47":
                     frameworkVersion = TargetDotNetFrameworkVersion.Version45;
                     return true;
             }
 
-            string svalue = string.Format("Version{0}", version);
-
-            return Enum.TryParse<TargetDotNetFrameworkVersion>(svalue, out frameworkVersion);
-
+            frameworkVersion = TargetDotNetFrameworkVersion.VersionLatest;
+            return false;
         }
 
         public static bool TryParsePlatform(string architecture, out DotNetFrameworkArchitecture frameworkArchitecture)
