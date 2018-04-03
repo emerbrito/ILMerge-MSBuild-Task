@@ -310,9 +310,8 @@ namespace ILMerge.MsBuild.Task
 
             if (this.UnmergedAssemblies != null && this.UnmergedAssemblies.Any())
             {
-                foreach (var fullpath in this.UnmergedAssemblies)
+                foreach (var dir in this.UnmergedAssemblies)
                 {
-                    var dir = Path.GetDirectoryName(fullpath);
                     settings.Advanced.SearchDirectories.Add(dir);
                 }
             }
