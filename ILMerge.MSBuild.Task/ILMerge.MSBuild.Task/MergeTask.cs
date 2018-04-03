@@ -312,7 +312,10 @@ namespace ILMerge.MsBuild.Task
             {
                 foreach (var dir in this.UnmergedAssemblies)
                 {
-                    settings.Advanced.SearchDirectories.Add(dir);
+                    if (!settings.Advanced.SearchDirectories.Contains(dir))
+                    {
+                        settings.Advanced.SearchDirectories.Add(dir);
+                    }
                 }
             }
         }
