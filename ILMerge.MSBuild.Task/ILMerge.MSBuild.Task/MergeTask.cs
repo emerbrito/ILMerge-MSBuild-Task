@@ -53,7 +53,7 @@ namespace ILMerge.MsBuild.Task
 
         public virtual ITaskItem[] InputAssemblies { get; set; }
 
-        public string[] UnmergedAssemblies { get; set; }
+        public string[] AdditionalLocations { get; set; }
 
         [Required]
         public string ConfigurationFilePath { get; set; }
@@ -308,9 +308,9 @@ namespace ILMerge.MsBuild.Task
                 settings.Advanced.SearchDirectories.Add(this.TargetDir);
             }
 
-            if (this.UnmergedAssemblies != null && this.UnmergedAssemblies.Any())
+            if (this.AdditionalLocations != null && this.AdditionalLocations.Any())
             {
-                foreach (var dir in this.UnmergedAssemblies)
+                foreach (var dir in this.AdditionalLocations)
                 {
                     if (!settings.Advanced.SearchDirectories.Contains(dir))
                     {

@@ -47,6 +47,12 @@ namespace ILMerge.MsBuild.Task
         public string ToJson()
         {
             var srl = new JavaScriptSerializer();
+
+            if(this.Advanced != null && this.Advanced.SearchDirectories != null)
+            {
+                this.Advanced.SearchDirectories = this.Advanced.SearchDirectories.OrderBy(d => d).ToList();
+            }
+            
             var json = srl.Serialize(this);
             return json;
         }
