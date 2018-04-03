@@ -7,6 +7,7 @@
 
     <ItemGroup>
       <CopyLocalReferences Include="@(ReferencePath)" Condition=" '%(CopyLocal)' == 'true' "/>
+      <DoNotCopyReferences Include="@(ReferencePath)" Condition=" '%(CopyLocal)' == 'false' " />
     </ItemGroup>
 
     <MergeTask
@@ -19,6 +20,7 @@
       TargetPath="$(TargetPath)"
       TargetFileName="$(TargetFileName)"
       InputAssemblies="@(CopyLocalReferences)"
+      AdditionalLocations="@(DoNotCopyReferences->'%(rootdir)%(directory)')"
       TargetFrameworkVersion="$(TargetFrameworkVersion)"
       TargetArchitecture="$(Platform)"
       KeyFile="$(AssemblyOriginatorKeyFile)"

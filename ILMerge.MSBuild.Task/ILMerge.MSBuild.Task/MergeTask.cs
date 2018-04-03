@@ -53,6 +53,8 @@ namespace ILMerge.MsBuild.Task
 
         public virtual ITaskItem[] InputAssemblies { get; set; }
 
+        public string[] AdditionalLocations { get; set; }
+
         [Required]
         public string ConfigurationFilePath { get; set; }
 
@@ -106,22 +108,24 @@ namespace ILMerge.MsBuild.Task
             var settings = new MergerSettings();
 
             // try to read configuration if file exists
-            if (!ReadConfigFile(out jsonConfig)) {
+            if (!ReadConfigFile(out jsonConfig))
+            {
                 return false;
             }
 
             // replace tokens if applicable
-            if(!string.IsNullOrWhiteSpace(jsonConfig))
+            if (!string.IsNullOrWhiteSpace(jsonConfig))
             {
                 jsonConfig = ReplaceTokens(jsonConfig);
-            }            
+            }
 
             // if json config exists, try to deserialize into settings object
-            if (!string.IsNullOrWhiteSpace(jsonConfig) && !DeserializeJsonConfig(jsonConfig, out settings)) {
+            if (!string.IsNullOrWhiteSpace(jsonConfig) && !DeserializeJsonConfig(jsonConfig, out settings))
+            {
                 return false;
             }
 
-            if(settings == null)
+            if (settings == null)
             {
                 // create instance if seetings still null which indicates a custom json config was not used
                 settings = new MergerSettings();
@@ -129,10 +133,10 @@ namespace ILMerge.MsBuild.Task
 
             // apply defaults
             SetDefaults(settings);
-            
-            if(settings.General.AlternativeILMergePath.HasValue())
+
+            if (settings.General.AlternativeILMergePath.HasValue())
             {
-                if(!File.Exists(settings.General.AlternativeILMergePath))
+                if (!File.Exists(settings.General.AlternativeILMergePath))
                 {
                     Log.LogError($"An alternative path for ILMerge.exe was provided but the file was not found: {settings.General.AlternativeILMergePath}");
                     return false;
@@ -148,10 +152,10 @@ namespace ILMerge.MsBuild.Task
                 exePath = this.GetILMergePath();
             }
 
-            if(!exePath.HasValue())
+            if (!exePath.HasValue())
             {
-                Log.LogError("ILMerge.exe was no located. Make sure you have the ILMerge nuget package installed. " 
-                    + "If you defined a custom packages folder in your Nuget.Config it is possible we are having a hard time figuring it out. " 
+                Log.LogError("ILMerge.exe was no located. Make sure you have the ILMerge nuget package installed. "
+                    + "If you defined a custom packages folder in your Nuget.Config it is possible we are having a hard time figuring it out. "
                     + "In this case please use attribute 'AlternativeILMergePath' in the configuration file to indicate the full path for ILMerge.exe.");
                 return false;
             }
@@ -197,7 +201,7 @@ namespace ILMerge.MsBuild.Task
             settings = null;
             bool success = true;
 
-            if(string.IsNullOrWhiteSpace(jsonConfig))
+            if (string.IsNullOrWhiteSpace(jsonConfig))
             {
                 Log.LogError("Unable to deserialize configuration. Configuration string is null or empty.");
                 return false;
@@ -239,7 +243,7 @@ namespace ILMerge.MsBuild.Task
 
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            if(settings.General == null)
+            if (settings.General == null)
             {
                 settings.General = new GeneralSettings();
             }
@@ -262,14 +266,14 @@ namespace ILMerge.MsBuild.Task
                 Log.LogMessage($"Applying default value for TargetPlatform: {settings.General.TargetPlatform}");
             }
 
-            if(settings.General.InputAssemblies == null || settings.General.InputAssemblies.Count == 0)
+            if (settings.General.InputAssemblies == null || settings.General.InputAssemblies.Count == 0)
             {
                 Log.LogMessage("No input assembles were found in configuration.");
 
                 settings.General.InputAssemblies = new List<string>();
 
                 Log.LogMessage($"Adding target assembly: {this.TargetPath}");
-                settings.General.InputAssemblies.Add(this.TargetPath);                
+                settings.General.InputAssemblies.Add(this.TargetPath);
 
                 foreach (var item in this.InputAssemblies)
                 {
@@ -286,7 +290,7 @@ namespace ILMerge.MsBuild.Task
                 }
 
                 Log.LogMessage($"Adding target assembly at position [0]: {this.TargetPath}");
-                settings.General.InputAssemblies.Insert(0, this.TargetPath);                
+                settings.General.InputAssemblies.Insert(0, this.TargetPath);
             }
 
             if (settings.Advanced == null)
@@ -294,17 +298,26 @@ namespace ILMerge.MsBuild.Task
                 settings.Advanced = new AdvancedSettings();
             }
 
-            if(settings.Advanced.SearchDirectories == null)
+            if (settings.Advanced.SearchDirectories == null)
             {
                 settings.Advanced.SearchDirectories = new List<string>();
             }
 
-            if(!settings.Advanced.SearchDirectories.Contains(this.TargetDir))
+            if (!settings.Advanced.SearchDirectories.Contains(this.TargetDir))
             {
                 settings.Advanced.SearchDirectories.Add(this.TargetDir);
             }
 
-            
+            if (this.AdditionalLocations != null && this.AdditionalLocations.Any())
+            {
+                foreach (var dir in this.AdditionalLocations)
+                {
+                    if (!settings.Advanced.SearchDirectories.Contains(dir))
+                    {
+                        settings.Advanced.SearchDirectories.Add(dir);
+                    }
+                }
+            }
         }
 
         private bool MergeAssemblies(string mergerPath, MergerSettings settings)
@@ -337,13 +350,13 @@ namespace ILMerge.MsBuild.Task
             merger.UnionMerge = settings.Advanced.UnionMerge;
             merger.XmlDocumentation = settings.Advanced.XmlDocumentation;
 
-            if(!string.IsNullOrWhiteSpace(settings.Advanced.ExcludeFile))
+            if (!string.IsNullOrWhiteSpace(settings.Advanced.ExcludeFile))
                 merger.ExcludeFile = settings.Advanced.ExcludeFile;
 
             merger.Internalize = settings.Advanced.Internalize;
-            
+
             if (settings.Advanced.TargetKind.HasValue())
-                merger.TargetKind = (dynamic) Enum.Parse(merger.TargetKind.GetType(), settings.Advanced.TargetKind);
+                merger.TargetKind = (dynamic)Enum.Parse(merger.TargetKind.GetType(), settings.Advanced.TargetKind);
 
             if (settings.Advanced.Version.HasValue())
             {
@@ -366,7 +379,7 @@ namespace ILMerge.MsBuild.Task
                 }
             }
 
-            string[] tp = settings.General.TargetPlatform.Split(new string[] {","}, StringSplitOptions.RemoveEmptyEntries);
+            string[] tp = settings.General.TargetPlatform.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
             merger.SetTargetPlatform(tp[0].Trim(), @tp[1].Trim());
             merger.SetInputAssemblies(settings.General.InputAssemblies.ToArray());
@@ -447,7 +460,7 @@ namespace ILMerge.MsBuild.Task
                         Log.LogMessage($"Loading configuration from: {ConfigurationFilePath}");
                         jsonConfig = File.ReadAllText(ConfigurationFilePath, Encoding.UTF8);
                         Log.LogMessage($"Configuration file loaded successfully.");
-                                                
+
                     }
                     catch (Exception ex)
                     {
@@ -483,7 +496,7 @@ namespace ILMerge.MsBuild.Task
             }
 
             // look at target dir;
-            if(!string.IsNullOrWhiteSpace(TargetDir))
+            if (!string.IsNullOrWhiteSpace(TargetDir))
             {
                 if (ExeLocationHelper.TryValidateILMergePath(this.TargetDir, out exePath))
                 {
@@ -499,7 +512,7 @@ namespace ILMerge.MsBuild.Task
             }
 
             // look for "packages" folder at the solution root and if one is found, look for ILMerge package folder
-            if(!string.IsNullOrWhiteSpace(this.SolutionDir))
+            if (!string.IsNullOrWhiteSpace(this.SolutionDir))
             {
                 if (ExeLocationHelper.TryILMergeInSolutionDir(this.SolutionDir, out exePath))
                 {
@@ -543,7 +556,7 @@ namespace ILMerge.MsBuild.Task
 
             if (string.IsNullOrWhiteSpace(relativePath)) throw new ArgumentNullException(relativePath);
 
-            if(Path.IsPathRooted(relativePath))
+            if (Path.IsPathRooted(relativePath))
             {
                 return relativePath;
             }
@@ -576,3 +589,5 @@ namespace ILMerge.MsBuild.Task
 
     }
 }
+
+
