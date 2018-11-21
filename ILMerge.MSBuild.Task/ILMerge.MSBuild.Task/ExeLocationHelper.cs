@@ -117,7 +117,7 @@ namespace ILMerge.MsBuild.Task
             DirectoryInfo root = null;
             DirectoryInfo[] subDirs = null;
 
-            logger.LogWarning("Task lib location: {0}", dir.FullName);            
+            logger.LogMessage("Task lib location: {0}", dir.FullName);            
 
             if (dir.Parent == null)
             {
@@ -134,7 +134,7 @@ namespace ILMerge.MsBuild.Task
             root = dir.Parent.Parent;
             subDirs = root.GetDirectories("ILMerge.*", SearchOption.TopDirectoryOnly);
 
-            logger.LogWarning("Package location: {0}", root.FullName);
+            logger.LogMessage("Package location: {0}", root.FullName);
 
             if (subDirs == null || subDirs.Count() == 0)
             {
@@ -148,7 +148,7 @@ namespace ILMerge.MsBuild.Task
                 var files = item.GetFiles("ILMerge.exe", SearchOption.AllDirectories);
                 if(files != null && files.Any())
                 {
-                    logger.LogWarning("Executable found by dynamic searach at: {0}", item.FullName);
+                    logger.LogMessage("Executable found by dynamic searach at: {0}", item.FullName);
                     executablePath = files[0].FullName;
                     return true;
                 }
