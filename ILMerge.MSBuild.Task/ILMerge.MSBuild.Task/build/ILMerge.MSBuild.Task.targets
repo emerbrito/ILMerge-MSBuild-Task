@@ -23,7 +23,8 @@
       AdditionalLocations="@(DoNotCopyReferences->'%(rootdir)%(directory)')"
       TargetFrameworkVersion="$(TargetFrameworkVersion)"
       TargetArchitecture="$(Platform)"
-      KeyFile="$(AssemblyOriginatorKeyFile)"
+      ILMergeConsolePath="$(ILMergeConsolePath)"
+      KeyFile="$(AssemblyOriginatorKeyFile)"      
       ConfigurationFilePath="$(ProjectDir)ILMergeConfig.json"
       />
 

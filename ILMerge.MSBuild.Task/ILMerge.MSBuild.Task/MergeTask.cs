@@ -82,6 +82,8 @@ namespace ILMerge.MsBuild.Task
 
         public string TargetArchitecture { get; set; }
 
+        public string ILMergeConsolePath { get; set; }
+
         public string KeyFile { get; set; }
 
         #endregion
@@ -190,6 +192,7 @@ namespace ILMerge.MsBuild.Task
             Log.LogMessage($"TargetFileName: {TargetFileName}");
             Log.LogMessage($"TargetFrameworkVersion: {TargetFrameworkVersion}");
             Log.LogMessage($"TargetArchitecture: {TargetArchitecture}");
+            Log.LogMessage($"ILMergeConsolePath: {ILMergeConsolePath}");
             Log.LogMessage($"KeyFile: {KeyFile}");
             Log.LogMessage($"ConfigurationFilePath: {ConfigurationFilePath}");
 
@@ -481,6 +484,18 @@ namespace ILMerge.MsBuild.Task
             string exePath = null;
             string errMsg;
             var failedPaths = new List<string>();
+
+            // Look at property containing ILMerge's full path. Supported in ILMerge nuget package 3.0.17 and above.
+            if (string.IsNullOrWhiteSpace(ILMergeConsolePath))
+            {
+                Log.LogWarning("Variable $(ILMergeConsolePath) is not available. For a better experience please make sure you are using the latest version of ilmerge's nuget pakcage.");
+            }
+            else
+            {
+                exePath = Path.GetFullPath(ILMergeConsolePath);
+                Log.LogMessage($"ILMerge.exe found at $(ILMergeConsolePath): {exePath}");
+                return exePath;
+            }
 
             // look at same directory as this assembly (task dll);
             if (ExeLocationHelper.TryValidateILMergePath(Path.GetDirectoryName(this.GetType().Assembly.Location), out exePath))
