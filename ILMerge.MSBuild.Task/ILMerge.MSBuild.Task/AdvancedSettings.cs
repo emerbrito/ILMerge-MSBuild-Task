@@ -46,7 +46,7 @@ namespace ILMerge.MsBuild.Task
         public bool AllowZeroPeKind { get; set; } = false;
 
         public string AttributeFile { get; set; } = null;
-
+        
         public bool Closed { get; set; } = false;
 
         public bool CopyAttributes { get; set; } = true;
@@ -54,6 +54,8 @@ namespace ILMerge.MsBuild.Task
         public bool DebugInfo { get; set; } = true;
 
         public bool DelaySign { get; set; } = false;
+
+        public bool DeleteCopiesOverwriteTarget { get; set; } = false;
 
         public string ExcludeFile { get; set; } = "";
 
