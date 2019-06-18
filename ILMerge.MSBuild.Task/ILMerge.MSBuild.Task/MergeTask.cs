@@ -100,8 +100,7 @@ namespace ILMerge.MsBuild.Task
         #region Public Methods
 
         public override bool Execute()
-        {
-
+        {            
             LogInputVariables();
 
             string jsonConfig;
@@ -422,8 +421,63 @@ namespace ILMerge.MsBuild.Task
                 ilmerge = null;
             }
 
+            if (settings.Advanced.DeleteCopiesOverwriteTarget)            
+                DeleteCopiesAndCopyTargetPath(settings);            
+
             return success;
 
+        }
+
+        private void DeleteCopiesAndCopyTargetPath(MergerSettings settings)
+        {
+            // Delete input assemblies and copy the merged outputfile to the TargetPath
+
+            Log.LogMessage(MessageImportance.Normal, "Deleting Merged Assembl{0}",
+                (settings.General.InputAssemblies.Count != 1) ? "ies" : "y");
+
+            foreach (string file in settings.General.InputAssemblies)
+            {
+                try
+                {
+                    // Input can reference dependency project, make sure the assembly is removed from the TargetDir                    
+                    DeleteFileAndPDB(Path.Combine(this.TargetDir, Path.GetFileName(file)));
+                }
+                catch (Exception ex)
+                {
+                    Log.LogErrorFromException(ex);
+                }
+            }
+
+            // Copy the output-file to the target-dir
+            Log.LogMessage(MessageImportance.Normal, "Overwriting OutputTarget");
+            try
+            {
+                // Remove and copy Target
+                DeleteFileAndPDB(this.TargetPath);
+
+                if (File.Exists(settings.General.OutputFile))
+                    File.Copy(settings.General.OutputFile, this.TargetPath);
+
+                // Also copy debug-information
+                string outputFilePDB = Path.ChangeExtension(settings.General.OutputFile, "pdb");
+                if (File.Exists(outputFilePDB))
+                    File.Copy(outputFilePDB, Path.ChangeExtension(this.TargetPath, "pdb"));
+            }
+            catch (Exception ex)
+            {
+                Log.LogErrorFromException(ex);
+            }
+        }
+
+        private static void DeleteFileAndPDB(string targetFile)
+        {
+            if (File.Exists(targetFile))
+                File.Delete(targetFile);
+
+            // Also do debug-output, if existing
+            string targetFilePDB = Path.ChangeExtension(targetFile, "pdb");
+            if (File.Exists(targetFilePDB))
+                File.Delete(targetFilePDB);
         }
 
         private Assembly LoadILMerge(string mergerPath)
