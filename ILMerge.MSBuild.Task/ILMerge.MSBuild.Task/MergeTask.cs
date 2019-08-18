@@ -542,7 +542,7 @@ namespace ILMerge.MsBuild.Task
             // Look at property containing ILMerge's full path. Supported in ILMerge nuget package 3.0.17 and above.
             if (string.IsNullOrWhiteSpace(ILMergeConsolePath))
             {
-                Log.LogWarning("Variable $(ILMergeConsolePath) is not available. For a better experience please make sure you are using the latest version of ilmerge's nuget pakcage.");
+                Log.LogWarning("Variable $(ILMergeConsolePath) is not available. For a better experience please make sure you are using the latest version of ilmerge's nuget package.");
             }
             else
             {
